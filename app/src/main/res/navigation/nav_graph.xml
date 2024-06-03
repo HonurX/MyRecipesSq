@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mealListFragment">
+
+    <fragment
+        android:id="@+id/mealListFragment"
+        android:name="com.onurgunes.myrecipes.view.MealListFragment"
+        android:label="fragment_meal_list"
+        tools:layout="@layout/fragment_meal_list" >
+        <action
+            android:id="@+id/action_mealListFragment_to_recipeAddFragment"
+            app:destination="@id/recipeAddFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recipeAddFragment"
+        android:name="com.onurgunes.myrecipes.view.RecipeAddFragment"
+        android:label="fragment_recipe_add"
+        tools:layout="@layout/fragment_recipe_add" />
+</navigation>
