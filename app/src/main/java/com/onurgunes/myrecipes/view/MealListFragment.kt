@@ -36,7 +36,7 @@ class MealListFragment : Fragment() {
     }
 
      private fun menuClick (view: View) {
-         val action = MealListFragmentDirections.actionMealListFragmentToRecipeAddFragment()
+         val action = MealListFragmentDirections.actionMealListFragmentToRecipeAddFragment(id = -1 , bilgi = "yeni")
          Navigation.findNavController(view).navigate(action)
 
      }

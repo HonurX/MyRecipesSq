@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract.Data
 import android.provider.MediaStore
 import android.renderscript.ScriptGroup.Binding
 import androidx.fragment.app.Fragment
@@ -22,10 +23,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.persistableBundleOf
+import androidx.room.Database
+import androidx.room.Room
 import com.google.android.material.snackbar.Snackbar
+import com.onurgunes.myrecipes.Models.Tarif
 import com.onurgunes.myrecipes.databinding.FragmentMealListBinding
 import com.onurgunes.myrecipes.databinding.FragmentRecipeAddBinding
+import com.onurgunes.myrecipes.roomDb.TarifDao
+import com.onurgunes.myrecipes.roomDb.TarifDatabase
 import kotlinx.coroutines.sync.Semaphore
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 
@@ -35,7 +42,8 @@ class RecipeAddFragment : Fragment() {
  private lateinit var  activityResultLauncher: ActivityResultLauncher<Intent>
  private var secilenGorsel : Uri? = null
     private var secilenBitmap : Bitmap? = null
-
+   private lateinit var db : TarifDatabase
+private lateinit var  tarifDao : TarifDao
 
     // This property is only valid between onCreateView and
 // onDestroyView.
@@ -43,31 +51,71 @@ class RecipeAddFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?): View? {
 
-    ): View? {
+
+        registerLauncher()
+
+
+       // db = Room.databaseBuilder(requireContext(),TarifDatabase::class.java,"Tarifler").build()
+        // tarifDao = db.tarifDao()
+
+
+
         // Inflate the layout for this fragment
         _binding = FragmentRecipeAddBinding.inflate(inflater, container, false)
         val view = binding?.root
         return view
+
+
     }
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        registerLauncher()
 
         binding!!.imageView.setOnClickListener { selectImage(it) }
         binding!!.buttonDelete.setOnClickListener { delete(it) }
         binding!!.buttonSave.setOnClickListener { save(it) }
 
+         arguments?.let {
+             val bilgi = RecipeAddFragmentArgs.fromBundle(it).bilgi
+             if (bilgi == "yeni")  {
+                 binding!!.buttonDelete.isEnabled =false
+                 binding!!.buttonSave.isEnabled = true
+                 binding!!.editTextText.setText("")
+                 binding!!.editTextText2.setText("")
 
+             } else  {
+                 binding!!.buttonDelete.isEnabled =true
+                 binding!!.buttonSave.isEnabled= false
+
+             }
+
+         }
 
     }
 
 
     fun save(view: View) {
+
+       val isim =  binding!!.editTextText.text.toString()
+        val malzeme = binding!!.editTextText2.text.toString()
+
+        if (secilenBitmap != null) {
+
+            val kucukBitmap = secilenBitmap
+            val outputSTream = ByteArrayOutputStream()
+            kucukBitmap!!.compress(Bitmap.CompressFormat.PNG,50,outputSTream)
+            val byteArray = outputSTream.toByteArray()
+            val tarif = Tarif(isim,malzeme,byteArray)
+
+
+
+        }
+
 
     }
 
@@ -146,6 +194,30 @@ class RecipeAddFragment : Fragment() {
           }
 
      }
+
+    private fun kucukBitmapOlustur(kullanicininSectigiBitmap: Bitmap, maximumBoyut: Int) : Bitmap {
+
+        var width = kullanicininSectigiBitmap.width
+        var height = kullanicininSectigiBitmap.height
+
+        val bitmapOrani: Double = width.toDouble() / height.toDouble()
+
+        if (bitmapOrani > 1) {
+            // görselimiz yatay
+            width = maximumBoyut
+            val kisaltilmisHeight = width / bitmapOrani
+            height = kisaltilmisHeight.toInt()
+        } else {
+            //görselimiz dikey
+            height = maximumBoyut
+            val kisaltilmisWidth = height * bitmapOrani
+            width = kisaltilmisWidth.toInt()
+
+        }
+
+
+        return Bitmap.createScaledBitmap(kullanicininSectigiBitmap, width, height, true)
+    }
 
 
 

@@ -13,10 +13,20 @@
         <action
             android:id="@+id/action_mealListFragment_to_recipeAddFragment"
             app:destination="@id/recipeAddFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/recipeAddFragment"
         android:name="com.onurgunes.myrecipes.view.RecipeAddFragment"
         android:label="fragment_recipe_add"
-        tools:layout="@layout/fragment_recipe_add" />
+        tools:layout="@layout/fragment_recipe_add" >
+        <argument
+            android:name="bilgi"
+            app:argType="string"
+            android:defaultValue="yeni" />
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
 </navigation>
